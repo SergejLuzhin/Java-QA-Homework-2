@@ -1,5 +1,6 @@
 package ru.yandexmarket;
 
+import helpers.DriverFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.openqa.selenium.WebDriver;
@@ -16,19 +17,26 @@ public class BaseTests {
 
     @BeforeEach
     public void before() {
-        System.setProperty("webdriver.chrome.driver", testProperties.driverChromeWindows());
+        //System.setProperty("webdriver.chrome.driver", testProperties.driverChromeWindows());
        // System.setProperty("webdriver.chrome.driver", "C:\\Files\\WebDrivers\\chromedriver.exe");
 
-        DesiredCapabilities capabilities = new DesiredCapabilities();
-        capabilities.setCapability(CapabilityType.PAGE_LOAD_STRATEGY,"none");
+        //DesiredCapabilities capabilities = new DesiredCapabilities();
+        //capabilities.setCapability(CapabilityType.PAGE_LOAD_STRATEGY,"none");
 
-        driver = new ChromeDriver(capabilities);
+        //driver = new ChromeDriver(capabilities);
+
+        driver = DriverFactory.create();
         driver.manage().window().maximize();
         driver.manage().timeouts().implicitlyWait(testProperties.defaultTimeout(), TimeUnit.SECONDS);
     }
 
     @AfterEach
     public void after() {
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         driver.quit();
     }
 }

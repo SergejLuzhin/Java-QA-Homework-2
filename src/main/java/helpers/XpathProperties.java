@@ -13,9 +13,24 @@ public interface XpathProperties extends Config {
     @Config.Key("ym.search.button")
     String ymSearchButtonXpath();
 
-    @Config.Key("ym.catalog.button.large")
+    @Config.Key("ym.catalog.button")
     String ymCatalogButtonXpath();
 
     @Config.Key("ym.catalog.category")
     String ymCatalogCategoryXpath();
+
+    @Config.Key("ym.catalog.subcategory")
+    String ymCatalogSubcategoryXpath();
+
+    @Config.Key("ym.filter.priceMin")
+    String ymFilterPriceMinXpath();
+
+    @Config.Key("ym.filter.priceMax")
+    String ymFilterPriceMaxXpath();
+
+    @Config.Key("ym.filter.brand")
+    String ymFilterBrandXpath();
+
+    @Config.Key("ym.card.on.all.pages")
+    String ymCardsOnAllPagesXpath();
 }
