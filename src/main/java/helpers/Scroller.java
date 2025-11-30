@@ -20,13 +20,6 @@ import java.time.Duration;
 public class Scroller {
 
     /**
-     * Экземпляр WebDriver, используемый для выполнения JavaScript-операций прокрутки.
-     *
-     * @author Сергей Лужин
-     */
-    private static WebDriver driver = Driver.webDriver;
-
-    /**
      * Плавно прокручивает страницу до самого низа,
      * или до максимального количества шагов,
      * фиксируя страницу скриншотами.
@@ -34,6 +27,7 @@ public class Scroller {
      * @author Сергей Лужин
      */
     public static void scrollToBottomOfPage() {
+        WebDriver driver = Driver.getWebDriver();
         JavascriptExecutor js = (JavascriptExecutor) driver;
 
         int scrollStep = 600;          // на сколько пикселей скроллим за шаг
@@ -74,6 +68,7 @@ public class Scroller {
      * @author Сергей Лужин
      */
     public static void scrollToTopOfPage() {
+        WebDriver driver = Driver.getWebDriver();
         JavascriptExecutor js = (JavascriptExecutor) driver;
 
         int scrollStep = 1000;          // на сколько пикселей скроллим за шаг
@@ -110,6 +105,7 @@ public class Scroller {
      * @author Сергей Лужин
      */
     public static void goToElementOnPage(WebElement element) {
+        WebDriver driver = Driver.getWebDriver();
         JavascriptExecutor js = (JavascriptExecutor) driver;
         js.executeScript("arguments[0].scrollIntoView({behavior:'instant', block:'center'});", element);
     }

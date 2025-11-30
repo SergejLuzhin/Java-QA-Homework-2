@@ -1,9 +1,12 @@
 package ru.yandexmarket;
 
+import helpers.Driver;
 import io.qameta.allure.Feature;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import pages.YandexMarketBasePage;
 
@@ -52,16 +55,24 @@ public class Tests extends BaseTests {
     @ParameterizedTest(name = "{displayName}: {arguments}")
     @MethodSource("helpers.DataProvider#providerYMtestCatalog")
     public void testYandexMarketCatalog(String category, String subcategory, int minPrice, int maxPrice, List<String> brands, int checkedElementIndex, int checkedProductsAmount){
-        YandexMarketBasePage yandexMarketBasePage = new YandexMarketBasePage();
         openSite(testProperties.yandexMarketUrl());
+        YandexMarketBasePage yandexMarketBasePage = new YandexMarketBasePage();
         chooseCategory(category, subcategory, yandexMarketBasePage);
         checkPageTitle(subcategory);
         setFilters(minPrice, maxPrice, brands, yandexMarketBasePage);
         List<WebElement> productCards = getAllProductCards(yandexMarketBasePage);
         String savedProductTitle = getProductName(productCards, checkedElementIndex, yandexMarketBasePage);
+        System.out.println(Driver.getWebDriver().findElement(By.xpath("//div[contains(@data-auto, 'SerpList')]//div[contains(@data-apiary-widget-name, 'SnippetConstructor')]//div[contains(@data-auto-themename, 'listDetailed')]//span[contains(@data-auto, 'price')]/span")).getText());
+        //
         goBySearchQuery(savedProductTitle, yandexMarketBasePage);
         checkSavedProduct(savedProductTitle, yandexMarketBasePage);
         softCheckProductsAmountOnPage(productCards, checkedProductsAmount);
+    }
+
+
+    @Test
+    public void test() {
+        System.out.println(Driver.getWebDriver().findElement(By.xpath("//div[contains(@data-auto, 'SerpList')]//div[contains(@data-apiary-widget-name, 'SnippetConstructor')]//div[contains(@data-auto-themename, 'listDetailed')]//span[contains(@data-auto, 'price')]")).getText());
     }
 
 }

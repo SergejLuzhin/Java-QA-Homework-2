@@ -18,8 +18,8 @@ public class DataProvider {
                         "Электроника",                      // String category
                         "Ноутбуки",              // String subcategory
                         10000,                            // int minPrice
-                        20000,                            // int maxPrice
-                        Arrays.asList("Lenovo", "HP"), // List<String> brands
+                        30000,                            // int maxPrice
+                        Arrays.asList("Lenovo"), // List<String> brands
                         0,                                 // int checkedElementIndex
                         12                             // int checkedProductAmount
                 )

@@ -35,7 +35,7 @@ public class BaseTests {
     @BeforeEach
     public void before() {
         Driver.create();
-        driver = Driver.webDriver;
+        driver = Driver.getWebDriver();
     }
 
     /**

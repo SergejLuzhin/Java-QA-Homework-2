@@ -15,7 +15,6 @@ import java.io.ByteArrayInputStream;
  */
 public class Screenshoter {
 
-    private static WebDriver driver = Driver.webDriver;
     /**
      * Делает скриншот текущего состояния браузера и прикрепляет его к отчёту Allure.
      *
@@ -24,6 +23,7 @@ public class Screenshoter {
      * @author Сергей Лужин
      */
     public static void attachScreenshot(String name) {
+        WebDriver driver = Driver.getWebDriver();
         try {
             if (driver instanceof TakesScreenshot) {
                 byte[] screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);

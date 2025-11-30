@@ -25,7 +25,11 @@ public class Driver {
      *
      * @author Сергей Лужин
      */
-    public static WebDriver webDriver;
+    private static WebDriver webDriver;
+
+    public static WebDriver getWebDriver () {
+        return webDriver;
+    }
 
     /**
      * Создаёт и настраивает экземпляр WebDriver для дальнейшего использования.

@@ -119,4 +119,7 @@ public interface XpathProperties extends Config {
      */
     @Config.Key("ym.card.title.addon")
     String ymCardTitleAddonXpath();
+
+    @Config.Key("ym.card.price.addon")
+    String ymCardPriceAddonXpath();
 }

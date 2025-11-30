@@ -8,6 +8,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import pages.YandexMarketBasePage;
 
+
 import java.util.List;
 
 /**
@@ -18,13 +19,6 @@ import java.util.List;
  * @author Сергей Лужин
  */
 public class YandexMarketSteps {
-    /**
-     * Экземпляр WebDriver, используемый для выполнения шагов теста.
-     *
-     * @author Сергей Лужин
-     */
-    private static WebDriver driver = Driver.webDriver;
-
 
     /**
      * Открывает указанный URL в переданном экземпляре WebDriver
@@ -36,8 +30,7 @@ public class YandexMarketSteps {
      */
     @Step("Переходим на сайт: {url}")
     public static void openSite(String url){
-        driver.get(url);
-        //WebDriverWait wait = new WebDriverWait(driver, testProperties.defaultTimeout());
+        Driver.getWebDriver().get(url);
     }
 
     /**
@@ -151,7 +144,7 @@ public class YandexMarketSteps {
      */
     @Step("Проверяем, что открытая страница сответсвует категории {subcategory}")
     public static void checkPageTitle(String subcategory) {
-        Assertions.assertTrue(driver.getTitle().contains(subcategory), "Тайтл " + driver.getTitle() + " на сайте не соответствует категории " + subcategory);
+        Assertions.assertTrue(Driver.getWebDriver().getTitle().contains(subcategory), "Тайтл " + Driver.getWebDriver().getTitle() + " на сайте не соответствует категории " + subcategory);
     }
 
     /**

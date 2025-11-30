@@ -1,19 +1,16 @@
 package pages;
 
 import helpers.Driver;
-import helpers.Screenshoter;
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.openqa.selenium.Keys.ENTER;
 import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfElementLocated;
 
 import static helpers.Properties.testProperties;
@@ -38,7 +35,7 @@ public class YandexMarketBasePage {
      *
      * @author Сергей Лужин
      */
-    protected WebDriver driver = Driver.webDriver;
+    protected WebDriver driver;
 
     /**
      * Поле ввода поискового запроса.
@@ -77,19 +74,14 @@ public class YandexMarketBasePage {
      * @author Сергей Лужин
      */
     public YandexMarketBasePage() {
+        this.driver = Driver.getWebDriver();
         this.wait = new WebDriverWait(driver, testProperties.defaultTimeout());
 
-        this.searchInput = wait.until(
-                visibilityOfElementLocated(By.xpath(xpathProperties.ymSearchInputXpath()))
-        );
+        this.searchInput = driver.findElement(By.xpath(xpathProperties.ymSearchInputXpath()));
 
-        this.searchButton = wait.until(
-                visibilityOfElementLocated(By.xpath(xpathProperties.ymSearchButtonXpath()))
-        );
+        this.searchButton = driver.findElement(By.xpath(xpathProperties.ymSearchButtonXpath()));
 
-        this.catalogButton = wait.until(
-                visibilityOfElementLocated(By.xpath(xpathProperties.ymCatalogButtonXpath()))
-        );
+        this.catalogButton = driver.findElement(By.xpath(xpathProperties.ymCatalogButtonXpath()));
     }
 
     /**
@@ -100,9 +92,9 @@ public class YandexMarketBasePage {
      * @author Сергей Лужин
      */
     public void findViaSearchInput(String query) {
-        searchInput.click();
+        searchInput = Driver.getWebDriver().findElement(By.xpath(xpathProperties.ymSearchInputXpath()));
         searchInput.sendKeys(query);
-        searchButton.click();
+        searchInput.sendKeys(ENTER);
     }
 
     /**
@@ -223,6 +215,10 @@ public class YandexMarketBasePage {
     public String getProductCardTitle(WebElement element){
         WebElement titleElement = element.findElement(By.xpath(xpathProperties.ymCardTitleAddonXpath()));
         return titleElement.getText();
+    }
+
+    public int getProductCardPrice(WebElement element) {
+        return Integer.parseInt(element.findElement(By.xpath(xpathProperties.ymCardPriceAddonXpath())).getText());
     }
 
     /**

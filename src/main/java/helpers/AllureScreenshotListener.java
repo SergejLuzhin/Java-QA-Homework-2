@@ -15,24 +15,6 @@ import static helpers.Screenshoter.attachScreenshot;
 public class AllureScreenshotListener extends AbstractWebDriverEventListener {
 
     /**
-     * Экземпляр WebDriver, используемый для создания скриншотов.
-     *
-     * @author Сергей Лужин
-     */
-    private final WebDriver driver = Driver.webDriver;
-
-    /**
-     * Создаёт новый экземпляр слушателя с привязанным WebDriver.
-     *
-     * @param driver экземпляр WebDriver, из которого будут сниматься скриншоты
-     *
-     * @author Сергей Лужин
-     */
-    //public AllureScreenshotListener(WebDriver driver) {
-    //    this.driver = driver;
-   // }
-
-    /**
      * Вызывается после клика по элементу.
      * Делает скриншот страницы и прикрепляет его к отчёту Allure.
      *
