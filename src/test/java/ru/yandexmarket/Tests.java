@@ -1,16 +1,16 @@
 package ru.yandexmarket;
 
-import helpers.Assertions;
 import io.qameta.allure.Feature;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.openqa.selenium.WebElement;
+import pages.YandexMarketBasePage;
 
 
 import java.util.List;
 
-import static steps.Steps.*;
+import static steps.YandexMarketSteps.*;
 import static helpers.Properties.testProperties;
 
 /**
@@ -52,15 +52,16 @@ public class Tests extends BaseTests {
     @ParameterizedTest(name = "{displayName}: {arguments}")
     @MethodSource("helpers.DataProvider#providerYMtestCatalog")
     public void testYandexMarketCatalog(String category, String subcategory, int minPrice, int maxPrice, List<String> brands, int checkedElementIndex, int checkedProductsAmount){
-        openSite(testProperties.yandexMarketUrl(), driver);
-        chooseCategory(category, subcategory);
-        Assertions.assertTrue(driver.getTitle().contains(subcategory), "Тайтл " + driver.getTitle() + " на сайте не соответствует категории " + subcategory);
-        setFilters(minPrice, maxPrice, brands);
-        List<WebElement> productCards = getAllProductCards();
-        String savedProductTitle = getProductName(productCards, checkedElementIndex);
-        goBySearchQuery(savedProductTitle);
-        Assertions.assertTrue(getAllProductsTitles().contains(savedProductTitle), "Товар " + savedProductTitle + " не был найден на странице");
-        Assertions.assertTrue(productCards.size() > checkedProductsAmount, "Тест прошел, но товаров в заданной категории было меньше " + checkedProductsAmount + ". Было найдено только " + productCards.size() + " товаров.");
+        YandexMarketBasePage yandexMarketBasePage = new YandexMarketBasePage();
+        openSite(testProperties.yandexMarketUrl());
+        chooseCategory(category, subcategory, yandexMarketBasePage);
+        checkPageTitle(subcategory);
+        setFilters(minPrice, maxPrice, brands, yandexMarketBasePage);
+        List<WebElement> productCards = getAllProductCards(yandexMarketBasePage);
+        String savedProductTitle = getProductName(productCards, checkedElementIndex, yandexMarketBasePage);
+        goBySearchQuery(savedProductTitle, yandexMarketBasePage);
+        checkSavedProduct(savedProductTitle, yandexMarketBasePage);
+        softCheckProductsAmountOnPage(productCards, checkedProductsAmount);
     }
 
 }

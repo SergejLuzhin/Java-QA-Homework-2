@@ -1,5 +1,6 @@
 package pages;
 
+import helpers.Driver;
 import helpers.Screenshoter;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -37,7 +38,7 @@ public class YandexMarketBasePage {
      *
      * @author Сергей Лужин
      */
-    protected WebDriver driver;
+    protected WebDriver driver = Driver.webDriver;
 
     /**
      * Поле ввода поискового запроса.
@@ -72,18 +73,19 @@ public class YandexMarketBasePage {
      * Конструктор инициализирует элементы страницы,
      * ожидая появления ключевых элементов поиска и каталога.
      *
-     * @param driver экземпляр WebDriver, используемый для работы со страницей
      *
      * @author Сергей Лужин
      */
-    public YandexMarketBasePage(WebDriver driver) {
-        this.driver = driver;
+    public YandexMarketBasePage() {
         this.wait = new WebDriverWait(driver, testProperties.defaultTimeout());
 
-        wait.until(visibilityOfElementLocated(By.xpath(xpathProperties.ymSearchInputXpath())));
-        this.searchInput = driver.findElement(By.xpath(xpathProperties.ymSearchInputXpath()));
+        this.searchInput = wait.until(
+                visibilityOfElementLocated(By.xpath(xpathProperties.ymSearchInputXpath()))
+        );
 
-        this.searchButton = driver.findElement(By.xpath(xpathProperties.ymSearchButtonXpath()));
+        this.searchButton = wait.until(
+                visibilityOfElementLocated(By.xpath(xpathProperties.ymSearchButtonXpath()))
+        );
 
         this.catalogButton = wait.until(
                 visibilityOfElementLocated(By.xpath(xpathProperties.ymCatalogButtonXpath()))
@@ -97,7 +99,7 @@ public class YandexMarketBasePage {
      *
      * @author Сергей Лужин
      */
-    public void find(String query) {
+    public void findViaSearchInput(String query) {
         searchInput.click();
         searchInput.sendKeys(query);
         searchButton.click();
@@ -162,9 +164,6 @@ public class YandexMarketBasePage {
         );
 
         inputFilterPriceMin.sendKeys(Integer.toString(price));
-
-        //ждем прогрузки первой карточки товара, чтобы продолжить
-        wait.until(visibilityOfElementLocated(By.xpath("(" + xpathProperties.ymCardsOnAllPagesXpath() + ")[1]")));
     }
 
     /**
@@ -181,9 +180,6 @@ public class YandexMarketBasePage {
         );
 
         inputFilterPriceMax.sendKeys(Integer.toString(price));
-
-        //ждем прогрузки первой карточки товара, чтобы продолжить
-        wait.until(visibilityOfElementLocated(By.xpath("(" + xpathProperties.ymCardsOnAllPagesXpath() + ")[1]")));
     }
 
     /**
@@ -202,9 +198,6 @@ public class YandexMarketBasePage {
             );
 
             brandFilterElement.click();
-
-            //ждем прогрузки первой карточки товара, чтобы продолжить
-            wait.until(visibilityOfElementLocated(By.xpath("(" + xpathProperties.ymCardsOnAllPagesXpath() + ")[1]")));
         }
     }
 
@@ -217,94 +210,6 @@ public class YandexMarketBasePage {
      */
     public List<WebElement> getAllProductCardsOnPage() {
         return driver.findElements(By.xpath(xpathProperties.ymCardsOnAllPagesXpath()));
-    }
-
-    /**
-     * Плавно прокручивает страницу до самого низа,
-     * или до максимального количества шагов,
-     * фиксируя страницу скриншотами.
-     *
-     * @author Сергей Лужин
-     */
-    public void scrollToBottomOfPage() {
-        JavascriptExecutor js = (JavascriptExecutor) driver;
-
-        int scrollStep = 600;          // на сколько пикселей скроллим за шаг
-        long pauseMs = 400;            // «плавная» пауза между шагами
-        int maxSteps = 50;             // защита от бесконечного цикла
-
-        for (int i = 0; i < maxSteps; i++) {
-            Screenshoter.attachScreenshot("Прокрутка страницы вниз", driver);
-
-            // скроллим вниз на scrollStep пикселей
-            js.executeScript("window.scrollBy(0, arguments[0]);", scrollStep);
-
-            long targetTime = System.currentTimeMillis() + pauseMs;
-            new FluentWait<>(driver)
-                    .withTimeout(Duration.ofMillis(pauseMs + 50))
-                    .pollingEvery(Duration.ofMillis(50))
-                    .ignoring(Exception.class)
-                    .until(d -> System.currentTimeMillis() >= targetTime);
-
-            // проверяем, дошли ли до низа страницы
-            long offset = ((Number) js.executeScript("return window.pageYOffset;")).longValue();      // текущая вертикальная позиция
-            long windowHeight = ((Number) js.executeScript("return window.innerHeight;")).longValue(); // видимая высота окна
-            long docHeight = ((Number) js.executeScript("return document.body.scrollHeight;")).longValue(); // общая высота страницы
-
-            if (offset + windowHeight >= docHeight) {
-                break;
-            }
-        }
-    }
-
-    /**
-     * Плавно прокручивает страницу до самого верха,
-     * или до максимального количества шагов,
-     * (как правило скролла вверх должно всегда хватать,
-     * так как он быстрее, чем скролл вниз)
-     * фиксируя страницу скриншотами.
-     *
-     * @author Сергей Лужин
-     */
-    public void scrollToTopOfPage() {
-        JavascriptExecutor js = (JavascriptExecutor) driver;
-
-        int scrollStep = 1000;          // на сколько пикселей скроллим за шаг
-        long pauseMs = 200;            // «плавная» пауза между шагами
-        int maxSteps = 50;             // защита от бесконечного цикла
-
-        for (int i = 0; i < maxSteps; i++) {
-            Screenshoter.attachScreenshot("Прокрутка страницы вверх", driver);
-
-            // скроллим вверх на scrollStep пикселей (отрицательное значение)
-            js.executeScript("window.scrollBy(0, arguments[0]);", -scrollStep);
-
-            long targetTime = System.currentTimeMillis() + pauseMs;
-            new FluentWait<>(driver)
-                    .withTimeout(Duration.ofMillis(pauseMs + 50))
-                    .pollingEvery(Duration.ofMillis(50))
-                    .ignoring(Exception.class)
-                    .until(d -> System.currentTimeMillis() >= targetTime);
-
-            // проверяем, дошли ли до верха страницы
-            long offset = ((Number) js.executeScript("return window.pageYOffset;")).longValue(); // текущая вертикальная позиция скролла
-
-            if (offset <= 0) {
-                break; // уже в самом верху — выходим
-            }
-        }
-    }
-
-    /**
-     * Прокручивает страницу к указанному элементу.
-     *
-     * @param element элемент, к которому выполняется прокрутка
-     *
-     * @author Сергей Лужин
-     */
-    public void goToElementOnPage(WebElement element) {
-        JavascriptExecutor js = (JavascriptExecutor) driver;
-        js.executeScript("arguments[0].scrollIntoView({behavior:'instant', block:'center'});", element);
     }
 
     /**
