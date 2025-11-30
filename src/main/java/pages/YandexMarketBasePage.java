@@ -1,33 +1,81 @@
 package pages;
 
+import helpers.Screenshoter;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfElementLocated;
-import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfAllElementsLocatedBy;
 
 import static helpers.Properties.testProperties;
 import static helpers.Properties.xpathProperties;
 
-
+/**
+ * Базовая страница Яндекс Маркета.
+ * Содержит общие элементы, действия и вспомогательные методы,
+ * необходимые для взаимодействия с интерфейсом каталога:
+ * поиск, навигация по категориям, работа с фильтрами,
+ * прокрутка страницы, получение карточек товаров и т.д.
+ *
+ * Все Page Object классы могут наследоваться от этого класса
+ * или использовать его методы через композицию.
+ *
+ * @author Сергей Лужин
+ */
 public class YandexMarketBasePage {
+
+    /**
+     * Экземпляр WebDriver, используемый для работы со страницей.
+     *
+     * @author Сергей Лужин
+     */
     protected WebDriver driver;
 
+    /**
+     * Поле ввода поискового запроса.
+     *
+     * @author Сергей Лужин
+     */
     protected WebElement searchInput;
 
+
+    /**
+     * Кнопка запуска поиска.
+     *
+     * @author Сергей Лужин
+     */
     protected WebElement searchButton;
 
+    /**
+     * Кнопка открытия каталога.
+     *
+     * @author Сергей Лужин
+     */
     protected WebElement catalogButton;
 
+    /**
+     * Объект явных ожиданий WebDriver.
+     *
+     * @author Сергей Лужин
+     */
     protected WebDriverWait wait;
 
+    /**
+     * Конструктор инициализирует элементы страницы,
+     * ожидая появления ключевых элементов поиска и каталога.
+     *
+     * @param driver экземпляр WebDriver, используемый для работы со страницей
+     *
+     * @author Сергей Лужин
+     */
     public YandexMarketBasePage(WebDriver driver) {
         this.driver = driver;
         this.wait = new WebDriverWait(driver, testProperties.defaultTimeout());
@@ -42,16 +90,36 @@ public class YandexMarketBasePage {
         );
     }
 
+    /**
+     * Выполняет поиск товара по текстовому запросу.
+     *
+     * @param query строка запроса для поиска
+     *
+     * @author Сергей Лужин
+     */
     public void find(String query) {
+        searchInput.click();
         searchInput.sendKeys(query);
         searchButton.click();
     }
 
+    /**
+     * Нажимает кнопку каталога.
+     *
+     * @author Сергей Лужин
+     */
     public void clickOnCatalogButton() {
         wait.until(visibilityOfElementLocated(By.xpath(xpathProperties.ymCatalogButtonXpath())));
         catalogButton.click();
     }
 
+    /**
+     * Наводит курсор на категорию каталога.
+     *
+     * @param category название категории
+     *
+     * @author Сергей Лужин
+     */
     public void hoverOnCategoryInCatalog(String category) {
         String xpath = xpathProperties.ymCatalogCategoryXpath().replace("*category*", category);
 
@@ -63,6 +131,13 @@ public class YandexMarketBasePage {
         actions.moveToElement(categoryElement).perform();
     }
 
+    /**
+     * Кликает по подкатегории каталога.
+     *
+     * @param subcategory название подкатегории
+     *
+     * @author Сергей Лужин
+     */
     public void clickOnSubcategoryInCatalog(String subcategory) {
         String xpath = xpathProperties.ymCatalogSubcategoryXpath().replace("*subcategory*", subcategory);
 
@@ -73,6 +148,12 @@ public class YandexMarketBasePage {
         subcategoryElement.click();
     }
 
+    /**
+     * Устанавливает минимальную цену в фильтре товаров.
+     *
+     * @param price минимальная цена
+     * @author Сергей Лужин
+     */
     public void setFilterPriceMin(int price) {
         String xpath = xpathProperties.ymFilterPriceMinXpath();
 
@@ -81,8 +162,17 @@ public class YandexMarketBasePage {
         );
 
         inputFilterPriceMin.sendKeys(Integer.toString(price));
+
+        //ждем прогрузки первой карточки товара, чтобы продолжить
+        wait.until(visibilityOfElementLocated(By.xpath("(" + xpathProperties.ymCardsOnAllPagesXpath() + ")[1]")));
     }
 
+    /**
+     * Устанавливает максимальную цену в фильтре товаров.
+     *
+     * @param price максимальная цена
+     * @author Сергей Лужин
+     */
     public void setFilterPriceMax(int price) {
         String xpath = xpathProperties.ymFilterPriceMaxXpath();
 
@@ -91,8 +181,18 @@ public class YandexMarketBasePage {
         );
 
         inputFilterPriceMax.sendKeys(Integer.toString(price));
+
+        //ждем прогрузки первой карточки товара, чтобы продолжить
+        wait.until(visibilityOfElementLocated(By.xpath("(" + xpathProperties.ymCardsOnAllPagesXpath() + ")[1]")));
     }
 
+    /**
+     * Устанавливает фильтры брендов, кликая по каждому бренду в списке.
+     *
+     * @param brands список брендов для фильтрации
+     *
+     * @author Сергей Лужин
+     */
     public void clickBrandCheckbox(List<String> brands) {
         for (String brand : brands) {
             String xpath = xpathProperties.ymFilterBrandXpath().replace("*brand*", brand);
@@ -102,63 +202,139 @@ public class YandexMarketBasePage {
             );
 
             brandFilterElement.click();
+
+            //ждем прогрузки первой карточки товара, чтобы продолжить
+            wait.until(visibilityOfElementLocated(By.xpath("(" + xpathProperties.ymCardsOnAllPagesXpath() + ")[1]")));
         }
     }
 
-    public void cardsOnAllPagesCount_OLD() {
-        String xpath = xpathProperties.ymCardsOnAllPagesXpath();
-
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-
-        //WebDriverWait waitCards = new WebDriverWait(driver, 10);
-
-        By cardsLocator = By.xpath(xpath);
-
-        List <WebElement> cardsOnPage = driver.findElements(By.xpath(xpath));
-
-        System.out.println("cards count: " + cardsOnPage.size());
+    /**
+     * Возвращает список карточек товаров на текущей странице.
+     *
+     * @return список WebElement карточек товаров
+     *
+     * @author Сергей Лужин
+     */
+    public List<WebElement> getAllProductCardsOnPage() {
+        return driver.findElements(By.xpath(xpathProperties.ymCardsOnAllPagesXpath()));
     }
 
-    public void cardsOnAllPagesCount() {
+    /**
+     * Плавно прокручивает страницу до самого низа,
+     * или до максимального количества шагов,
+     * фиксируя страницу скриншотами.
+     *
+     * @author Сергей Лужин
+     */
+    public void scrollToBottomOfPage() {
         JavascriptExecutor js = (JavascriptExecutor) driver;
 
-        By PRODUCT_CARDS = By.xpath(xpathProperties.ymCardsOnAllPagesXpath());
+        int scrollStep = 600;          // на сколько пикселей скроллим за шаг
+        long pauseMs = 400;            // «плавная» пауза между шагами
+        int maxSteps = 50;             // защита от бесконечного цикла
 
-        long endTime = System.currentTimeMillis() + 60_000; // общий таймаут скролла 30 сек
-        int previousCount = 0;
+        for (int i = 0; i < maxSteps; i++) {
+            Screenshoter.attachScreenshot("Прокрутка страницы вниз", driver);
 
-        List<WebElement> cards = new ArrayList<>();
+            // скроллим вниз на scrollStep пикселей
+            js.executeScript("window.scrollBy(0, arguments[0]);", scrollStep);
 
-        while (System.currentTimeMillis() < endTime) {
-            // текущие карточки
-            cards = driver.findElements(PRODUCT_CARDS);
-            int currentCount = cards.size();
-            System.out.println("Сейчас карточек: " + currentCount);
+            long targetTime = System.currentTimeMillis() + pauseMs;
+            new FluentWait<>(driver)
+                    .withTimeout(Duration.ofMillis(pauseMs + 50))
+                    .pollingEvery(Duration.ofMillis(50))
+                    .ignoring(Exception.class)
+                    .until(d -> System.currentTimeMillis() >= targetTime);
 
-            // если новых больше не появилось — выходим
-            if (currentCount == previousCount) {
-                System.out.println("Новых карточек не появилось, выходим из цикла");
-                break;
-            }
+            // проверяем, дошли ли до низа страницы
+            long offset = ((Number) js.executeScript("return window.pageYOffset;")).longValue();      // текущая вертикальная позиция
+            long windowHeight = ((Number) js.executeScript("return window.innerHeight;")).longValue(); // видимая высота окна
+            long docHeight = ((Number) js.executeScript("return document.body.scrollHeight;")).longValue(); // общая высота страницы
 
-            previousCount = currentCount;
-
-            // скроллим в самый низ
-            js.executeScript("window.scrollTo(0, document.body.scrollHeight);");
-
-            // даём странице время подгрузить товары
-            try {
-                Thread.sleep(20000); // 1 секунда, можно подправить
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
+            if (offset + windowHeight >= docHeight) {
                 break;
             }
         }
+    }
 
-        System.out.println("cards count: " + cards.size());
+    /**
+     * Плавно прокручивает страницу до самого верха,
+     * или до максимального количества шагов,
+     * (как правило скролла вверх должно всегда хватать,
+     * так как он быстрее, чем скролл вниз)
+     * фиксируя страницу скриншотами.
+     *
+     * @author Сергей Лужин
+     */
+    public void scrollToTopOfPage() {
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+
+        int scrollStep = 1000;          // на сколько пикселей скроллим за шаг
+        long pauseMs = 200;            // «плавная» пауза между шагами
+        int maxSteps = 50;             // защита от бесконечного цикла
+
+        for (int i = 0; i < maxSteps; i++) {
+            Screenshoter.attachScreenshot("Прокрутка страницы вверх", driver);
+
+            // скроллим вверх на scrollStep пикселей (отрицательное значение)
+            js.executeScript("window.scrollBy(0, arguments[0]);", -scrollStep);
+
+            long targetTime = System.currentTimeMillis() + pauseMs;
+            new FluentWait<>(driver)
+                    .withTimeout(Duration.ofMillis(pauseMs + 50))
+                    .pollingEvery(Duration.ofMillis(50))
+                    .ignoring(Exception.class)
+                    .until(d -> System.currentTimeMillis() >= targetTime);
+
+            // проверяем, дошли ли до верха страницы
+            long offset = ((Number) js.executeScript("return window.pageYOffset;")).longValue(); // текущая вертикальная позиция скролла
+
+            if (offset <= 0) {
+                break; // уже в самом верху — выходим
+            }
+        }
+    }
+
+    /**
+     * Прокручивает страницу к указанному элементу.
+     *
+     * @param element элемент, к которому выполняется прокрутка
+     *
+     * @author Сергей Лужин
+     */
+    public void goToElementOnPage(WebElement element) {
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        js.executeScript("arguments[0].scrollIntoView({behavior:'instant', block:'center'});", element);
+    }
+
+    /**
+     * Возвращает текст заголовка карточки товара.
+     *
+     * @param element веб-элемент карточки товара
+     * @return название товара
+     *
+     * @author Сергей Лужин
+     */
+    public String getProductCardTitle(WebElement element){
+        WebElement titleElement = element.findElement(By.xpath(xpathProperties.ymCardTitleAddonXpath()));
+        return titleElement.getText();
+    }
+
+    /**
+     * Получает названия всех товаров из списка карточек.
+     *
+     * @param productCards список веб-элементов карточек товаров
+     * @return список названий товаров
+     *
+     * @author Сергей Лужин
+     */
+    public List<String> getAllProductCardTitlesFromList(List<WebElement> productCards) {
+        List<String> productTitles = new ArrayList<>();
+
+        for (WebElement productCard : productCards) {
+            productTitles.add(getProductCardTitle(productCard));
+        }
+
+        return productTitles;
     }
 }
