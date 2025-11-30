@@ -1,23 +1,17 @@
 package ru.yandexmarket;
 
-import helpers.DriverFactory;
+import helpers.Driver;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.remote.CapabilityType;
-import org.openqa.selenium.remote.DesiredCapabilities;
-
-import java.util.concurrent.TimeUnit;
-
-import static helpers.Properties.testProperties;
 
 /**
- * Базовый класс для UI-тестов.
+ * Базовый класс для UI-тестов Яндекс Маркета.
  *
- * Отвечает за инициализацию перед каждым тестом и завершение работы WebDriver после каждого теста.
- * Все тестовые классы наследуются от данного класса, чтобы использовать
- * единые настройки драйвера, таймауты и логику закрытия браузера.
+ * Отвечает за инициализацию и завершение работы WebDriver
+ * перед и после выполнения каждого теста.
+ * Все тестовые классы должны наследоваться от этого класса,
+ * чтобы использовать единый механизм создания и закрытия браузера.
  *
  * @author Сергей Лужин
  */
@@ -33,22 +27,15 @@ public class BaseTests {
     /**
      * Метод, выполняемый перед каждым тестом.
      *
-     * Создаёт экземпляр WebDriver через {@link DriverFactory},
-     * разворачивает окно браузера на весь экран и задаёт
-     * неявное ожидание, заданное в тестовых настройках.
+     * Инициализирует WebDriver через {@link Driver#create()}
+     * и сохраняет его в поле {@link #driver} для использования в тестах.
      *
      * @author Сергей Лужин
      */
     @BeforeEach
     public void before() {
-        //DesiredCapabilities capabilities = new DesiredCapabilities();
-        //capabilities.setCapability(CapabilityType.PAGE_LOAD_STRATEGY,"none");
-
-        //driver = new ChromeDriver(capabilities);
-
-        driver = DriverFactory.create();
-        driver.manage().window().maximize();
-        driver.manage().timeouts().implicitlyWait(testProperties.defaultTimeout(), TimeUnit.SECONDS);
+        Driver.create();
+        driver = Driver.webDriver;
     }
 
     /**
@@ -60,11 +47,6 @@ public class BaseTests {
      */
     @AfterEach
     public void after() {
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
         driver.quit();
     }
 }

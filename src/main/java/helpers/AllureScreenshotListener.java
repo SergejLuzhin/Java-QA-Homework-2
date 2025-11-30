@@ -19,7 +19,7 @@ public class AllureScreenshotListener extends AbstractWebDriverEventListener {
      *
      * @author Сергей Лужин
      */
-    private final WebDriver driver;
+    private final WebDriver driver = Driver.webDriver;
 
     /**
      * Создаёт новый экземпляр слушателя с привязанным WebDriver.
@@ -28,22 +28,21 @@ public class AllureScreenshotListener extends AbstractWebDriverEventListener {
      *
      * @author Сергей Лужин
      */
-    public AllureScreenshotListener(WebDriver driver) {
-        this.driver = driver;
-    }
+    //public AllureScreenshotListener(WebDriver driver) {
+    //    this.driver = driver;
+   // }
 
     /**
      * Вызывается после клика по элементу.
      * Делает скриншот страницы и прикрепляет его к отчёту Allure.
      *
      * @param element элемент, по которому был выполнен клик
-     * @param driver  текущий экземпляр WebDriver
      *
      * @author Сергей Лужин
      */
     @Override
     public void afterClickOn(WebElement element, WebDriver driver) {
-        attachScreenshot("Клик", driver);
+        attachScreenshot("Клик");
     }
 
     /**
@@ -51,14 +50,13 @@ public class AllureScreenshotListener extends AbstractWebDriverEventListener {
      * Делает скриншот страницы и прикрепляет его к отчёту Allure.
      *
      * @param element элемент, значение которого изменилось
-     * @param driver  текущий экземпляр WebDriver
      * @param keys    последовательность символов, переданная в элемент
      *
      * @author Сергей Лужин
      */
     @Override
     public void afterChangeValueOf(WebElement element, WebDriver driver, CharSequence[] keys) {
-        attachScreenshot(String.format("Набор текста: %s", (Object) keys), driver);
+        attachScreenshot(String.format("Набор текста: %s", (Object) keys));
     }
 
     // Поиск элемента
@@ -72,13 +70,12 @@ public class AllureScreenshotListener extends AbstractWebDriverEventListener {
      * Делает скриншот сразу после завершения навигации.
      *
      * @param url    адрес, на который был выполнен переход
-     * @param driver текущий экземпляр WebDriver
      *
      * @author Сергей Лужин
      */
     @Override
     public void afterNavigateTo(String url, WebDriver driver) {
-        attachScreenshot("Перереход по: " + url, driver);
+        attachScreenshot("Перереход по: " + url);
     }
 
     /**
@@ -86,12 +83,11 @@ public class AllureScreenshotListener extends AbstractWebDriverEventListener {
      * Делает скриншот страницы на момент ошибки и прикрепляет его к отчёту Allure.
      *
      * @param throwable возникшее исключение
-     * @param driver    текущий экземпляр WebDriver
      *
      * @author Сергей Лужин
      */
     @Override
     public void onException(Throwable throwable, WebDriver driver) {
-        attachScreenshot("Ошибка: " + throwable, driver);
+        attachScreenshot("Ошибка: " + throwable);
     }
 }
