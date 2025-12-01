@@ -7,7 +7,7 @@ import helpers.SoftChecker;
 import io.qameta.allure.Step;
 import org.junit.jupiter.api.Assertions;
 import org.openqa.selenium.WebElement;
-import pages.YandexMarketBasePage;
+import pages.YandexMarketPage;
 
 
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * Класс с шагами для работы с интерфейсом Яндекс Маркета.
  * Используется в тестах как набор переиспользуемых действий:
- * открытие сайта, выбор категории, установка фильтров и работа с карточками товаров.
+ * открытие сайта, выбор категории, установка фильтров, работа с карточками товаров, проверки.
  *
  * @author Сергей Лужин
  */
@@ -46,7 +46,7 @@ public class YandexMarketSteps {
      * @author Сергей Лужин
      */
     @Step("Выбираем категорию '{category}' и подкатегорию {subcategory} в каталоге")
-    public static void chooseCategory(String category, String subcategory, YandexMarketBasePage ymPage) {
+    public static void chooseCategory(String category, String subcategory, YandexMarketPage ymPage) {
         ymPage.clickOnCatalogButton();
         ymPage.hoverOnCategoryInCatalog(category);
         ymPage.clickOnSubcategoryInCatalog(subcategory);
@@ -63,14 +63,23 @@ public class YandexMarketSteps {
      * @author Сергей Лужин
      */
     @Step("Устанавливаем фильтры поиска: Минимальная цена - {minPrice}, Максимальная цена - {maxPrice}, Бренды - {brands}")
-    public static void setFilters(int minPrice, int maxPrice, List<String> brands, YandexMarketBasePage ymPage) {
+    public static void setFilters(int minPrice, int maxPrice, List<String> brands, YandexMarketPage ymPage) {
         ymPage.setFilterPriceMin(minPrice);
         ymPage.setFilterPriceMax(maxPrice);
         ymPage.clickBrandCheckbox(brands);
     }
 
+    /**
+     * Получает все карточки товаров на странице,
+     * скроллит страницу вниз и вверх, для прогрузки всех карточек,
+     * а затем сохраняет каждый товар в сущность Product.
+     *
+     * @param ymPage объект страницы Яндекс Маркета
+     *
+     * @author Сергей Лужин
+     */
     @Step("Получаем список всех карточек товаров на странице")
-    public static void getAllProductCards(YandexMarketBasePage ymPage) {
+    public static void getAllProductCards(YandexMarketPage ymPage) {
         Scroller.scrollToBottomOfPage();
         Scroller.scrollToTopOfPage();
         List<WebElement> productCards = ymPage.getAllProductCardsOnPage();
@@ -80,8 +89,25 @@ public class YandexMarketSteps {
         }
     }
 
-    @Step("Получаем список всех элементов товаров и проверяем все элементы на странице на соответсвие фильтрам")
-    public static void runChecksSoftly(YandexMarketBasePage yandexMarketBeforeSearch, YandexMarketBasePage yandexMarketAfterSearch, int checkedAmount, int minPrice, int maxPrice, List<String> brands, int indexOfCheckedElement) {
+    /**
+     * Выполняет комплекс мягких проверок (soft assertions) по товарам:
+     * – соответствие товара поисковому запросу
+     * – попадание в ценовой диапазон
+     * – соответствие брендам
+     * – достаточное количество товаров после фильтрации
+     *
+     * @param yandexMarketBeforeSearch объект страницы до поиска
+     * @param yandexMarketAfterSearch  объект страницы после поиска
+     * @param checkedAmount            минимальное количество товаров
+     * @param minPrice                 минимальная цена
+     * @param maxPrice                 максимальная цена
+     * @param brands                   список брендов
+     * @param indexOfCheckedElement    индекс проверяемого товара
+     *
+     * @author Сергей Лужин
+     */
+    @Step("Проводим софт проверки по окончании теста. Проверяем количество товаров, их соответствие фильтрам, а также, что сохраненный товар был найден через поиск")
+    public static void runChecksSoftly(YandexMarketPage yandexMarketBeforeSearch, YandexMarketPage yandexMarketAfterSearch, int checkedAmount, int minPrice, int maxPrice, List<String> brands, int indexOfCheckedElement) {
         List<String> wrongPriceProducts = new ArrayList<>();
         List<String> wrongTitleProducts = new ArrayList<>();
         for (Product product : yandexMarketBeforeSearch.productsOnPage) {
@@ -102,6 +128,11 @@ public class YandexMarketSteps {
 
         Assertions.assertAll(
                 () -> SoftChecker.check(
+                        yandexMarketBeforeSearch.productsOnPage.size() > checkedAmount,
+                        "Проверяем, что после заданных фильтров было найдено как минимум " + checkedAmount + " товаров",
+                        "Было найдено меньше товаров, чем " + checkedAmount + ". Было найдено только " + yandexMarketBeforeSearch.productsOnPage.size() + " товаров"
+                ),
+                () -> SoftChecker.check(
                         productIsFoundOnPage,
                         "Проверяем: что " + checkedProduct.getTitle() + " был найден на странице после поиска",
                         "Товар " + checkedProduct.getTitle() + " не был найден на странице после поиска"
@@ -115,11 +146,6 @@ public class YandexMarketSteps {
                         wrongTitleProducts.isEmpty(),
                         "Проверяем, что товары на странице, после ввода фильтров соответствовали брендам " + brands,
                         "Были найдены товары, которые не соответствуют брендам " + brands + ": " + wrongTitleProducts
-                ),
-                () -> SoftChecker.check(
-                        yandexMarketBeforeSearch.productsOnPage.size() > checkedAmount,
-                        "Проверяем, что после заданных фильтров было найдено как минимум " + checkedAmount + " товаров",
-                        "Было найдено меньше товаров, чем " + checkedAmount + ". Было найдено только " + yandexMarketBeforeSearch.productsOnPage.size() + " товаров"
                 )
         );
     }
@@ -133,7 +159,7 @@ public class YandexMarketSteps {
      * @author Сергей Лужин
      */
     @Step("Делаем поиск на Яндекс Маркете по запросу: {query}")
-    public static void goBySearchQuery(String query, YandexMarketBasePage ymPage) {
+    public static void goBySearchQuery(String query, YandexMarketPage ymPage) {
         ymPage.findViaSearchInput(query);
     }
 

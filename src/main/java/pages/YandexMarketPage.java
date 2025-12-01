@@ -17,17 +17,41 @@ import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfElem
 import static helpers.Properties.testProperties;
 import static helpers.Properties.xpathProperties;
 
+/**
+ * Page Object для работы со страницами Яндекс Маркета.
+ * Инкапсулирует общие элементы и действия: поиск, работа с каталогом,
+ * фильтрами и карточками товаров.
+ *
+ * Использует WebDriver, получаемый из {@link Driver#getWebDriver()}.
+ *
+ * @author Сергей Лужин
+ */
+public class YandexMarketPage {
 
-public class YandexMarketBasePage {
-
+    /**
+     * Коллекция товаров, отображённых на текущей странице.
+     * Заполняется на основе найденных карточек товаров.
+     */
     public List<Product> productsOnPage;
 
+    /**
+     * Экземпляр WebDriver, используемый для взаимодействия со страницей.
+     */
     protected WebDriver driver;
 
+    /**
+     * Веб-элемент поля ввода поискового запроса на странице Яндекс Маркета.
+     */
     protected WebElement searchInput;
 
+    /**
+     * Веб-элемент кнопки запуска поиска по введённому запросу.
+     */
     protected WebElement searchButton;
 
+    /**
+     * Веб-элемент кнопки запуска поиска по введённому запросу.
+     */
     protected WebElement catalogButton;
 
     protected WebDriverWait wait;
@@ -39,7 +63,7 @@ public class YandexMarketBasePage {
      *
      * @author Сергей Лужин
      */
-    public YandexMarketBasePage() {
+    public YandexMarketPage() {
         this.driver = Driver.getWebDriver();
         this.wait = new WebDriverWait(driver, testProperties.defaultTimeout());
 
@@ -185,6 +209,15 @@ public class YandexMarketBasePage {
         return titleElement.getText();
     }
 
+    /**
+     * Возвращает числовое значение цены товара из карточки.
+     * Очищает текст от пробелов и нецифровых символов перед преобразованием.
+     *
+     * @param element веб-элемент карточки товара
+     * @return цена товара в виде целого числа
+     *
+     * @author Сергей Лужин
+     */
     public int getProductCardPrice(WebElement element) {
         return Integer.parseInt(element.findElement(By.xpath(xpathProperties.ymCardPriceAddonXpath())).getText()
                 .replaceAll("[\\s\\u00A0\\u2006\\u2007\\u2008\\u2009\\u200A]", "")

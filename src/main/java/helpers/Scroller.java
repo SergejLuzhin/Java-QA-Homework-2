@@ -7,7 +7,14 @@ import org.openqa.selenium.support.ui.FluentWait;
 
 import java.time.Duration;
 
-
+/**
+ * Утилитный класс для прокрутки веб-страниц.
+ * Содержит методы для плавного скролла вверх и вниз страницы
+ *
+ * Использует WebDriver, полученный через {@link Driver#getWebDriver()}.
+ *
+ * @author Сергей Лужин
+ */
 public class Scroller {
 
     /**
@@ -86,11 +93,5 @@ public class Scroller {
                 break; // уже в самом верху — выходим
             }
         }
-    }
-
-    public static void goToElementOnPage(WebElement element) {
-        WebDriver driver = Driver.getWebDriver();
-        JavascriptExecutor js = (JavascriptExecutor) driver;
-        js.executeScript("arguments[0].scrollIntoView({behavior:'instant', block:'center'});", element);
     }
 }

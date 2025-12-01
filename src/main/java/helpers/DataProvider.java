@@ -15,13 +15,13 @@ public class DataProvider {
     public static Stream<Arguments> providerYMtestCatalog(){
         return Stream.of(
                 Arguments.of(
-                        "Электроника",                      // String category
-                        "Ноутбуки",              // String subcategory
-                        30000,                            // int minPrice
-                        40000,                            // int maxPrice
-                        Arrays.asList("Lenovo"), // List<String> brands
-                        0,                                 // int checkedElementIndex
-                        12                             // int checkedProductAmount
+                        "Электроника",                       // String category
+                        "Ноутбуки",                                     // String subcategory
+                        10000,                                          // int minPrice
+                        20000,                                          // int maxPrice
+                        Arrays.asList("Lenovo", "HP"),                  // List<String> brands
+                        0,                                              // int indexOfCheckedElement
+                        12                                              // int checkedProductAmount
                 )
         );
     }
