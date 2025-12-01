@@ -1,5 +1,6 @@
 package ru.yandexmarket;
 
+import entity.Product;
 import helpers.Driver;
 import io.qameta.allure.Feature;
 import org.junit.jupiter.api.DisplayName;
@@ -7,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
 import pages.YandexMarketBasePage;
 
 
@@ -45,7 +45,7 @@ public class Tests extends BaseTests {
      * @param minPrice              минимальная цена фильтра
      * @param maxPrice              максимальная цена фильтра
      * @param brands                список брендов для фильтрации
-     * @param checkedElementIndex   индекс проверяемого товара в списке карточек (который сохраняем)
+     * @param indexOfCheckedElement   индекс проверяемого товара в списке карточек (который сохраняем)
      * @param checkedProductsAmount минимальное ожидаемое количество товаров в категории
      *
      * @author Сергей Лужин
@@ -54,25 +54,26 @@ public class Tests extends BaseTests {
     @DisplayName("Проверка каталога по заданным параметрам: ")
     @ParameterizedTest(name = "{displayName}: {arguments}")
     @MethodSource("helpers.DataProvider#providerYMtestCatalog")
-    public void testYandexMarketCatalog(String category, String subcategory, int minPrice, int maxPrice, List<String> brands, int checkedElementIndex, int checkedProductsAmount){
+    public void testYandexMarketCatalog(String category, String subcategory, int minPrice, int maxPrice, List<String> brands, int indexOfCheckedElement, int checkedProductsAmount){
         openSite(testProperties.yandexMarketUrl());
-        YandexMarketBasePage yandexMarketBasePage = new YandexMarketBasePage();
-        chooseCategory(category, subcategory, yandexMarketBasePage);
+        YandexMarketBasePage yandexMarketBeforeSearch = new YandexMarketBasePage();
+        chooseCategory(category, subcategory, yandexMarketBeforeSearch);
         checkPageTitle(subcategory);
-        setFilters(minPrice, maxPrice, brands, yandexMarketBasePage);
-        List<WebElement> productCards = getAllProductCards(yandexMarketBasePage);
-        String savedProductTitle = getProductName(productCards, checkedElementIndex, yandexMarketBasePage);
-        System.out.println(Driver.getWebDriver().findElement(By.xpath("//div[contains(@data-auto, 'SerpList')]//div[contains(@data-apiary-widget-name, 'SnippetConstructor')]//div[contains(@data-auto-themename, 'listDetailed')]//span[contains(@data-auto, 'price')]/span")).getText());
+        setFilters(minPrice, maxPrice, brands, yandexMarketBeforeSearch);
+        getAllProductCards(yandexMarketBeforeSearch);
+        //checkAllProductCardsForFilters(yandexMarketBeforeSearch, productCards, minPrice, maxPrice, brands);
+        //String savedProductTitle = getProductName(productCards, checkedElementIndex, yandexMarketBeforeSearch);
+        //System.out.println(Driver.getWebDriver().findElement(By.xpath("//div[contains(@data-auto, 'SerpList')]//div[contains(@data-apiary-widget-name, 'SnippetConstructor')]//div[contains(@data-auto-themename, 'listDetailed')]//span[contains(@data-auto, 'price')]/span")).getText());
         //
-        goBySearchQuery(savedProductTitle, yandexMarketBasePage);
-        checkSavedProduct(savedProductTitle, yandexMarketBasePage);
-        softCheckProductsAmountOnPage(productCards, checkedProductsAmount);
-    }
+        goBySearchQuery(yandexMarketBeforeSearch.productsOnPage.get(indexOfCheckedElement).getTitle(), yandexMarketBeforeSearch);
+        YandexMarketBasePage yandexMarketAfterSearch = new YandexMarketBasePage();
+        getAllProductCards(yandexMarketAfterSearch);
+        runChecksSoftly(yandexMarketBeforeSearch, yandexMarketAfterSearch, checkedProductsAmount,minPrice, maxPrice, brands, indexOfCheckedElement);
 
-
-    @Test
-    public void test() {
-        System.out.println(Driver.getWebDriver().findElement(By.xpath("//div[contains(@data-auto, 'SerpList')]//div[contains(@data-apiary-widget-name, 'SnippetConstructor')]//div[contains(@data-auto-themename, 'listDetailed')]//span[contains(@data-auto, 'price')]")).getText());
+        //getAllProductCards(1, yandexMarketBeforeSearch);
+        //checkSavedProduct(Product.savedProducts.get(0).get(checkedElementIndex).getTitle(), yandexMarketBeforeSearch);
+        //softCheckProductsAmountOnPage(productCards, checkedProductsAmount);
+        //softCheckAllProductCardsForFiltersAndAmount(yandexMarketBeforeSearch, productCards, checkedProductsAmount, minPrice, maxPrice, brands);
     }
 
 }

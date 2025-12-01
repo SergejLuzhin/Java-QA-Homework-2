@@ -1,5 +1,6 @@
 package pages;
 
+import entity.Product;
 import helpers.Driver;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -29,6 +30,8 @@ import static helpers.Properties.xpathProperties;
  * @author Сергей Лужин
  */
 public class YandexMarketBasePage {
+
+    public List<Product> productsOnPage;
 
     /**
      * Экземпляр WebDriver, используемый для работы со страницей.
@@ -82,6 +85,8 @@ public class YandexMarketBasePage {
         this.searchButton = driver.findElement(By.xpath(xpathProperties.ymSearchButtonXpath()));
 
         this.catalogButton = driver.findElement(By.xpath(xpathProperties.ymCatalogButtonXpath()));
+
+        this.productsOnPage = new ArrayList<>();
     }
 
     /**
@@ -194,7 +199,7 @@ public class YandexMarketBasePage {
     }
 
     /**
-     * Возвращает список карточек товаров на текущей странице.
+     * Возвращает список веб-элементов карточек товаров на текущей странице.
      *
      * @return список WebElement карточек товаров
      *
@@ -218,7 +223,9 @@ public class YandexMarketBasePage {
     }
 
     public int getProductCardPrice(WebElement element) {
-        return Integer.parseInt(element.findElement(By.xpath(xpathProperties.ymCardPriceAddonXpath())).getText());
+        return Integer.parseInt(element.findElement(By.xpath(xpathProperties.ymCardPriceAddonXpath())).getText()
+                .replaceAll("[\\s\\u00A0\\u2006\\u2007\\u2008\\u2009\\u200A]", "")
+                .replaceAll("[^\\d]", ""));
     }
 
     /**
@@ -229,7 +236,7 @@ public class YandexMarketBasePage {
      *
      * @author Сергей Лужин
      */
-    public List<String> getAllProductCardTitlesFromList(List<WebElement> productCards) {
+    /*public List<String> getAllProductCardTitlesFromList(List<WebElement> productCards) {
         List<String> productTitles = new ArrayList<>();
 
         for (WebElement productCard : productCards) {
@@ -237,5 +244,5 @@ public class YandexMarketBasePage {
         }
 
         return productTitles;
-    }
+    }*/
 }

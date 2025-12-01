@@ -17,8 +17,8 @@ public class DataProvider {
                 Arguments.of(
                         "Электроника",                      // String category
                         "Ноутбуки",              // String subcategory
-                        10000,                            // int minPrice
-                        30000,                            // int maxPrice
+                        30000,                            // int minPrice
+                        40000,                            // int maxPrice
                         Arrays.asList("Lenovo"), // List<String> brands
                         0,                                 // int checkedElementIndex
                         12                             // int checkedProductAmount

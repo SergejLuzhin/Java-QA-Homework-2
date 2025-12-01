@@ -1,14 +1,19 @@
 package steps;
 
+import entity.Product;
 import helpers.Driver;
 import helpers.Scroller;
+import helpers.SoftChecker;
 import io.qameta.allure.Step;
 import org.junit.jupiter.api.Assertions;
+import org.assertj.core.api.SoftAssertions;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import pages.YandexMarketBasePage;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -77,10 +82,67 @@ public class YandexMarketSteps {
      * @author Сергей Лужин
      */
     @Step("Получаем список всех карточек товаров на странице")
-    public static List<WebElement> getAllProductCards(YandexMarketBasePage ymPage) {
+    public static void getAllProductCards(YandexMarketBasePage ymPage) {
         Scroller.scrollToBottomOfPage();
         Scroller.scrollToTopOfPage();
-        return ymPage.getAllProductCardsOnPage();
+        List<WebElement> productCards = ymPage.getAllProductCardsOnPage();
+
+        for (WebElement productCard : productCards) {
+            Product.saveProductFromElement(productCard, ymPage);
+        }
+    }
+
+    /*@Step("Получаем список всех элементов товаров и проверяем все элементы на странице на соответсвие фильтрам")
+    public static List<WebElement> checkAllProductCardsForFilters(YandexMarketBasePage ymPage, int minPrice, int maxPrice, List<String> brands) {
+        List<WebElement> productCardsElements = new ArrayList<>();
+        Scroller.scrollToBottomOfPage();
+        Scroller.scrollToTopOfPage();
+        productCardsElements = ymPage.getAllProductCardsOnPage();
+
+        List<String> wrongPriceProductTitles = new ArrayList<>();
+        List<String> wrongTitleProductTitles = new ArrayList<>();
+        for (WebElement productCard : productCardsElements) {
+            String productCardTitle = ymPage.getProductCardTitle(productCard);
+
+            if (ymPage.getProductCardPrice(productCard) < minPrice || ymPage.getProductCardPrice(productCard) > maxPrice) {
+                wrongPriceProductTitles.add(productCardTitle);
+            }
+            if (brands.stream().anyMatch(brand -> productCardTitle.contains(brand))) {
+                wrongTitleProductTitles.add(productCardTitle);
+            }
+        }
+
+        assertAll("Проверяем найденные карточки товаров на соответсвие и количесвто",
+                () -> Assertions.assertTrue(productCardsElements.size()));
+    }*/
+
+    @Step("Получаем список всех элементов товаров и проверяем все элементы на странице на соответсвие фильтрам")
+    public static void runChecksSoftly(YandexMarketBasePage yandexMarketBeforeSearch, YandexMarketBasePage yandexMarketAfterSearch, int checkedAmount, int minPrice, int maxPrice, List<String> brands, int indexOfCheckedElement) {
+        List<String> wrongPriceProductTitles = new ArrayList<>();
+        List<String> wrongTitleProductTitles = new ArrayList<>();
+        for (Product product : yandexMarketBeforeSearch.productsOnPage) {
+
+            if (product.getPrice() < minPrice || product.getPrice() > maxPrice) {
+                wrongPriceProductTitles.add(product.getTitle());
+            }
+            if (!brands.stream().anyMatch(brand -> product.getTitle().contains(brand)) && !product.getTitle().isEmpty()) {
+                wrongTitleProductTitles.add(product.getTitle());
+            }
+        }
+
+        Product checkedProduct = yandexMarketBeforeSearch.productsOnPage.get(indexOfCheckedElement);
+
+        boolean productIsFoundOnPage = yandexMarketAfterSearch.productsOnPage.stream()
+                .anyMatch(p -> p.equals(checkedProduct));
+
+        Assertions.assertAll(
+                () -> SoftChecker.checkProductFound(productIsFoundOnPage, checkedProduct,
+                        "Проверяем: что " + checkedProduct.getTitle() + " был найден на странице после поиска",
+                        "Товар " + checkedProduct.getTitle() + " не был найден на странице после поиска"),
+                () -> SoftChecker.checkPriceFilter(wrongPriceProductTitles, minPrice, maxPrice),
+                () -> SoftChecker.checkBrandFilter(wrongTitleProductTitles, brands),
+                () -> SoftChecker.checkProductsCount(yandexMarketBeforeSearch.productsOnPage.size(), checkedAmount)
+        );
     }
 
     /**
@@ -94,11 +156,11 @@ public class YandexMarketSteps {
      *
      * @author Сергей Лужин
      */
-    @Step("Возвращаемся в начало списка и сохраняем название товара под номером {elementNumber} на странице")
+    /*@Step("Возвращаемся в начало списка и сохраняем название товара под номером {elementNumber} на странице")
     public static String getProductName(List<WebElement> elementList, int elementNumber, YandexMarketBasePage ymPage){
         Scroller.goToElementOnPage(elementList.get(elementNumber));
         return ymPage.getProductCardTitle(elementList.get(elementNumber));
-    }
+    }*/
 
     /**
      * Выполняет поиск товара на Яндекс Маркете по переданному текстовому запросу.
@@ -125,13 +187,13 @@ public class YandexMarketSteps {
      *
      * @author Сергей Лужин
      */
-    @Step("Получаем названия всех товаров на странице")
+   /* @Step("Получаем названия всех товаров на странице")
     public static List<String> getAllProductsTitles(YandexMarketBasePage ymPage) {
         Scroller.scrollToBottomOfPage();
         Scroller.scrollToTopOfPage();
         List<WebElement> productCardsOnPage = ymPage.getAllProductCardsOnPage();
         return ymPage.getAllProductCardTitlesFromList(productCardsOnPage);
-    }
+    }*/
 
     /**
      * Проверяет, что заголовок (title) текущей страницы
@@ -157,10 +219,10 @@ public class YandexMarketSteps {
      *
      * @author Сергей Лужин
      */
-    @Step("Проверяем, что товар {savedProductTitle} был найден на странице")
+   /* @Step("Проверяем, что товар {savedProductTitle} был найден на странице")
     public static void checkSavedProduct(String savedProductTitle, YandexMarketBasePage ymPage) {
         Assertions.assertTrue(getAllProductsTitles(ymPage).contains(savedProductTitle), "Товар " + savedProductTitle + " не был найден на странице");
-    }
+    }*/
 
     /**
      * Выполняет мягкую проверку количества найденных товаров на странице.

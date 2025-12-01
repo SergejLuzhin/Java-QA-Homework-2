@@ -32,7 +32,7 @@ public class Scroller {
 
         int scrollStep = 600;          // на сколько пикселей скроллим за шаг
         long pauseMs = 400;            // «плавная» пауза между шагами
-        int maxSteps = 50;             // защита от бесконечного цикла
+        int maxSteps = 20;             // защита от бесконечного цикла
 
         for (int i = 0; i < maxSteps; i++) {
             Screenshoter.attachScreenshot("Прокрутка страницы вниз");
