@@ -17,56 +17,19 @@ import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfElem
 import static helpers.Properties.testProperties;
 import static helpers.Properties.xpathProperties;
 
-/**
- * Базовая страница Яндекс Маркета.
- * Содержит общие элементы, действия и вспомогательные методы,
- * необходимые для взаимодействия с интерфейсом каталога:
- * поиск, навигация по категориям, работа с фильтрами,
- * прокрутка страницы, получение карточек товаров и т.д.
- *
- * Все Page Object классы могут наследоваться от этого класса
- * или использовать его методы через композицию.
- *
- * @author Сергей Лужин
- */
+
 public class YandexMarketBasePage {
 
     public List<Product> productsOnPage;
 
-    /**
-     * Экземпляр WebDriver, используемый для работы со страницей.
-     *
-     * @author Сергей Лужин
-     */
     protected WebDriver driver;
 
-    /**
-     * Поле ввода поискового запроса.
-     *
-     * @author Сергей Лужин
-     */
     protected WebElement searchInput;
 
-
-    /**
-     * Кнопка запуска поиска.
-     *
-     * @author Сергей Лужин
-     */
     protected WebElement searchButton;
 
-    /**
-     * Кнопка открытия каталога.
-     *
-     * @author Сергей Лужин
-     */
     protected WebElement catalogButton;
 
-    /**
-     * Объект явных ожиданий WebDriver.
-     *
-     * @author Сергей Лужин
-     */
     protected WebDriverWait wait;
 
     /**
@@ -227,22 +190,4 @@ public class YandexMarketBasePage {
                 .replaceAll("[\\s\\u00A0\\u2006\\u2007\\u2008\\u2009\\u200A]", "")
                 .replaceAll("[^\\d]", ""));
     }
-
-    /**
-     * Получает названия всех товаров из списка карточек.
-     *
-     * @param productCards список веб-элементов карточек товаров
-     * @return список названий товаров
-     *
-     * @author Сергей Лужин
-     */
-    /*public List<String> getAllProductCardTitlesFromList(List<WebElement> productCards) {
-        List<String> productTitles = new ArrayList<>();
-
-        for (WebElement productCard : productCards) {
-            productTitles.add(getProductCardTitle(productCard));
-        }
-
-        return productTitles;
-    }*/
 }

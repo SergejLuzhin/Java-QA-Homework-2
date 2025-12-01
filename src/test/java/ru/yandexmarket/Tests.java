@@ -1,13 +1,9 @@
 package ru.yandexmarket;
 
-import entity.Product;
-import helpers.Driver;
 import io.qameta.allure.Feature;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.openqa.selenium.By;
 import pages.YandexMarketBasePage;
 
 
@@ -16,40 +12,9 @@ import java.util.List;
 import static steps.YandexMarketSteps.*;
 import static helpers.Properties.testProperties;
 
-/**
- * Набор UI-тестов для проверки работы каталога Яндекс Маркета.
- *
- * Содержит параметризованный тест, который проверяет:
- * корректность перехода по категориям, применение фильтров
- * и поиск товара по его названию.
- *
- * @author Сергей Лужин
- */
 public class Tests extends BaseTests {
 
-    /**
-     * Параметризованный тест проверки каталога Яндекс Маркета по заданным фильтрам.
-     *
-     * Алгоритм теста:
-     * 1) Открывает главную страницу Яндекс Маркета.
-     * 2) Переходит в указанную категорию и подкатегорию.
-     * 3) Проверяет, что заголовок страницы содержит название подкатегории.
-     * 4) Устанавливает фильтр по цене и брендам.
-     * 5) Получает список карточек товаров и сохраняет одну по заданному индексу.
-     * 6) Ищет сохраненный товар через строку поиска.
-     * 7) Проверяет, что товар присутствует в результатах поиска.
-     * 8) Проверяет, что общее количество найденных товаров после первого перехода по категории больше заданного порога.
-     *
-     * @param category              основная категория каталога
-     * @param subcategory           подкатегория каталога
-     * @param minPrice              минимальная цена фильтра
-     * @param maxPrice              максимальная цена фильтра
-     * @param brands                список брендов для фильтрации
-     * @param indexOfCheckedElement   индекс проверяемого товара в списке карточек (который сохраняем)
-     * @param checkedProductsAmount минимальное ожидаемое количество товаров в категории
-     *
-     * @author Сергей Лужин
-     */
+
     @Feature("Проверка каталога яндекс маркета")
     @DisplayName("Проверка каталога по заданным параметрам: ")
     @ParameterizedTest(name = "{displayName}: {arguments}")
@@ -61,19 +26,10 @@ public class Tests extends BaseTests {
         checkPageTitle(subcategory);
         setFilters(minPrice, maxPrice, brands, yandexMarketBeforeSearch);
         getAllProductCards(yandexMarketBeforeSearch);
-        //checkAllProductCardsForFilters(yandexMarketBeforeSearch, productCards, minPrice, maxPrice, brands);
-        //String savedProductTitle = getProductName(productCards, checkedElementIndex, yandexMarketBeforeSearch);
-        //System.out.println(Driver.getWebDriver().findElement(By.xpath("//div[contains(@data-auto, 'SerpList')]//div[contains(@data-apiary-widget-name, 'SnippetConstructor')]//div[contains(@data-auto-themename, 'listDetailed')]//span[contains(@data-auto, 'price')]/span")).getText());
-        //
         goBySearchQuery(yandexMarketBeforeSearch.productsOnPage.get(indexOfCheckedElement).getTitle(), yandexMarketBeforeSearch);
         YandexMarketBasePage yandexMarketAfterSearch = new YandexMarketBasePage();
         getAllProductCards(yandexMarketAfterSearch);
         runChecksSoftly(yandexMarketBeforeSearch, yandexMarketAfterSearch, checkedProductsAmount,minPrice, maxPrice, brands, indexOfCheckedElement);
-
-        //getAllProductCards(1, yandexMarketBeforeSearch);
-        //checkSavedProduct(Product.savedProducts.get(0).get(checkedElementIndex).getTitle(), yandexMarketBeforeSearch);
-        //softCheckProductsAmountOnPage(productCards, checkedProductsAmount);
-        //softCheckAllProductCardsForFiltersAndAmount(yandexMarketBeforeSearch, productCards, checkedProductsAmount, minPrice, maxPrice, brands);
     }
 
 }
